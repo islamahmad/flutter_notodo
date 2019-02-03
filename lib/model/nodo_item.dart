@@ -7,12 +7,25 @@ class NoDoItem extends StatelessWidget {
   String get itemName => _itemName;
   String get dateCreated => _dateCreated;
   int get id => _id;
+  // default constructor
   NoDoItem(this._itemName, this._dateCreated);
+  // named sonctructors to be compatible with SQFlite
   NoDoItem.map(dynamic obj) {
+    // this is a named constructor, it will use a dynamic object
+    // to return an object of type NoDoItem
     this._itemName = obj["itemName"];
     this._dateCreated = obj["dateCreated"];
     if (this._id != null) this._id = obj["id"];
   }
+  // another named constructor that will be used to convert
+  // a map to an object of type NoToDoItem
+  NoDoItem.fromMap(Map<String, dynamic> map) {
+    this._itemName = map["itemName"];
+    this._dateCreated = map["dateCreated"];
+    if (map["id"] != null) this._id = map["id"];
+  }
+  // this is a method that can be called by an object of type NoToDoItem to
+  // convert it to a Map that is compatible with SQFlite package insert method
   Map<String, dynamic> toMap() {
     Map map = Map<String, dynamic>();
     map["itemName"] = this.itemName;
@@ -21,12 +34,7 @@ class NoDoItem extends StatelessWidget {
     return map;
   }
 
-  NoDoItem.fromMap(Map<String, dynamic> map) {
-    this._itemName = map["itemName"];
-    this._dateCreated = map["dateCreated"];
-    if (map["id"] != null) this._id = map["id"];
-  }
-
+  // this is me, not in the course
   String itemToString() {
     return 'NoDoItem{_itemName: $_itemName, _dateCreated: $_dateCreated, _id: $_id}';
   }

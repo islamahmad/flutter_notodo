@@ -76,4 +76,18 @@ class databaseHelper {
     var result = await dbClient.rawQuery(_getRecord + recordId.toString());
     return NoDoItem.fromMap(result.first);
   }
+
+  Future<int> deleteRecord(int del_id) async {
+    var dbClient = await db;
+    var result =
+        await dbClient.delete(tableName, where: 'id = ?', whereArgs: [del_id]);
+    return result;
+  }
+
+  Future<int> updateRecord(NoDoItem updItem) async {
+    var dbClient = await db;
+    var result = await dbClient.update(tableName, updItem.toMap(),
+        where: 'id = ?', whereArgs: [updItem.id]);
+    return result;
+  }
 }
