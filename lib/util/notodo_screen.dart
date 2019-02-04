@@ -15,9 +15,10 @@ class _NoTodoScreenState extends State<NoTodoScreen> {
   void _handleSubmitted(String text) async {
     _tec.clear();
     NoDoItem item = NoDoItem(text, DateTime.now().toIso8601String());
-    int savedID = await db.saveRecord(item); 
-    print("saved ID is : "+ savedID.toString()); 
-    var addedItem = await db.findRecord(savedID);
+    //int savedID = await db.saveRecord(item); 
+    var saved = await db.insertRecordFromList([text,DateTime.now().toIso8601String()]);
+    print("saved ID is : "+ saved.toString()); 
+    var addedItem = await db.findRecord(saved);
     print(addedItem.itemToString());
     setState(() {
       _itemList.insert(0, addedItem); 

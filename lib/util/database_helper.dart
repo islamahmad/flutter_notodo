@@ -23,6 +23,7 @@ class databaseHelper {
   static String _createTable =
       "CREATE TABLE $tableName ( $id INTEGER PRIMARYKEY , $column1 TEXT NOT NULL, $column2 Text NOT NULL)";
   static String _recordCount = "Select count(1) from $tableName";
+  static String _insertRecordFromListQuery = "INSERT INTO $tableName ($column1,$column2) VALUES (? , ?)"; 
   static String _getAllRecords = "SELECT * FROM $tableName ORDER BY $id";
   static String _getRecord = "SELECT * FROM $tableName where $id = ";
   // DB name to be used in initDB()
@@ -55,6 +56,17 @@ class databaseHelper {
     var dbClient = await db;
     int result = await dbClient.insert(tableName, record.toMap());
     return result;
+  }
+  Future<dynamic> insertRecordFromList(List list) async{
+    String itemName = list[0];
+    String dateCreated = list[1];
+    var dbClient = await db;
+    var result = await dbClient.transaction((txn) async {
+      int id = await txn.rawInsert(_insertRecordFromListQuery, [itemName, dateCreated]);  
+      return id;
+    } 
+    );
+    //return result; 
   }
 
   Future<int> getRecordCount() async {
