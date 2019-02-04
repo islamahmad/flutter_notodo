@@ -73,8 +73,14 @@ class databaseHelper {
 
   Future<NoDoItem> findRecord(int recordId) async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery(_getRecord + recordId.toString());
-    return NoDoItem.fromMap(result.first);
+    String query = _getRecord + recordId.toString();
+    print(query);
+    var result = await dbClient.rawQuery(query);
+    if (result.length != 0) return NoDoItem.fromMap(result.first);
+    else {
+      result = await dbClient.rawQuery("SELECT * FROM $tableName");
+      return NoDoItem.fromMap(result.last);
+    }
   }
 
   Future<int> deleteRecord(int del_id) async {

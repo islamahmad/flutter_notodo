@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notodo/model/nodo_item.dart';
 import 'database_helper.dart';
 
+
 class NoTodoScreen extends StatefulWidget {
   @override
   _NoTodoScreenState createState() => _NoTodoScreenState();
@@ -10,11 +11,17 @@ class NoTodoScreen extends StatefulWidget {
 class _NoTodoScreenState extends State<NoTodoScreen> {
   final TextEditingController _tec = TextEditingController();
   var db = databaseHelper(); 
+  final List <NoDoItem> _itemList = <NoDoItem>[]; // must initialize with empty list becasue it's final  
   void _handleSubmitted(String text) async {
     _tec.clear();
     NoDoItem item = NoDoItem(text, DateTime.now().toIso8601String());
     int savedID = await db.saveRecord(item); 
     print("saved ID is : "+ savedID.toString()); 
+    var addedItem = await db.findRecord(savedID);
+    print(addedItem.itemToString());
+    setState(() {
+      _itemList.insert(0, addedItem); 
+    });
     //_readNoDoList();
   }
   _readNoDoList() async{
@@ -47,7 +54,42 @@ class _NoTodoScreenState extends State<NoTodoScreen> {
         backgroundColor: Colors.redAccent,
         foregroundColor: Colors.white,
       ),
-      body: Column(),
+      body: Column(
+        children: <Widget>[
+          Flexible(
+            child: ListView.builder(
+              padding: EdgeInsets.all(8.0),
+              reverse: false,
+              itemCount: _itemList.length,
+              itemBuilder: (_, int index){
+                return Card(
+                  color: Colors.white10,
+                  child: 
+                    ListTile(
+                      title: _itemList[index],
+                      onLongPress: ()=> debugPrint("${_itemList[index].dateCreated}"),
+                      trailing: 
+                        Listener(
+                          key: Key(_itemList[index].itemName),
+                          child: 
+                            Icon(
+                              Icons.remove_circle, 
+                              color: Colors.redAccent,
+                            ),
+                            onPointerDown: (PointerEvent) {
+                              debugPrint("onPointerDown Event happened");
+                            },
+                        ),
+                    ),
+                );
+              } ,
+          ),
+          ),
+          Divider(
+            height: 1.0,
+          ),
+        ],
+      ),
     );
   }
 
