@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notodo/model/nodo_item.dart';
+import 'database_helper.dart';
 
 class NoTodoScreen extends StatefulWidget {
   @override
@@ -7,6 +9,26 @@ class NoTodoScreen extends StatefulWidget {
 
 class _NoTodoScreenState extends State<NoTodoScreen> {
   final TextEditingController _tec = TextEditingController();
+  var db = databaseHelper(); 
+  void _handleSubmitted(String text) async {
+    _tec.clear();
+    NoDoItem item = NoDoItem(text, DateTime.now().toIso8601String());
+    int savedID = await db.saveRecord(item); 
+    print("saved ID is : "+ savedID.toString()); 
+    //_readNoDoList();
+  }
+  _readNoDoList() async{
+    List items = await db.getAllRecords();
+    items.forEach((item) {
+      NoDoItem noDoItem = NoDoItem.map(item);
+      print( noDoItem.id.toString() + " ${noDoItem.itemName}");
+    });
+  }
+  @override
+  void initState(){
+    super.initState();
+    _readNoDoList();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +39,9 @@ class _NoTodoScreenState extends State<NoTodoScreen> {
         backgroundColor: Colors.black54,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showFormDialog(),
+        onPressed:
+        // null, 
+        () => _showFormDialog(),
         tooltip: "Add Item",
         child: Icon(Icons.add),
         backgroundColor: Colors.redAccent,
@@ -28,28 +52,35 @@ class _NoTodoScreenState extends State<NoTodoScreen> {
   }
 
   _showFormDialog() {
-    var alert = AlertDialog(
+    AlertDialog alert = AlertDialog(
       content: Row(
         children: <Widget>[
           Expanded(
               child: TextField(
             controller: _tec,
-            autocorrect: true,
+            autofocus: true,
             decoration: InputDecoration(
               labelText: 'Item',
               hintText: 'e.g. dont buy stuff',
               icon: Icon(Icons.save),
             ),
-          ))
+          ),
+          ),
         ],
       ),
       actions: <Widget>[
         FlatButton(
-          onPressed: () => _handleSubmit(_tec.text),
+          onPressed: () 
+          { 
+            _handleSubmitted(_tec.text);
+            _tec.clear()  ; 
+          },
           child: Icon(Icons.save_alt),
         ),
         FlatButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () { 
+            Navigator.pop(context);
+          },
           child: Icon(Icons.cancel),
         )
       ],
@@ -58,8 +89,9 @@ class _NoTodoScreenState extends State<NoTodoScreen> {
         context: context,
         builder: (_) {
           return alert;
-        });
+        },
+        );
   }
 
-  _handleSubmit(String text) async {}
+  
 }
